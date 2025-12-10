@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\StackFood.Payments.Application\StackFood.Payments.Application\StackFood.Payments.Application.csproj" />
+    <ProjectReference Include="..\..\StackFood.Payments.Domain\StackFood.Payments.Domain\StackFood.Payments.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.DynamoDBv2" Version="4.0.10.2" />
+    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.3.15" />
+    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="4.0.2.8" />
+    <PackageReference Include="AWSSDK.SQS" Version="4.0.2.6" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>
