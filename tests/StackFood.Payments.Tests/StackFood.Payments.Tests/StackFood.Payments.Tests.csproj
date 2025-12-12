@@ -30,7 +30,14 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\StackFood.Payments.Domain\StackFood.Payments.Domain\StackFood.Payments.Domain.csproj" />
     <ProjectReference Include="..\..\..\src\StackFood.Payments.Application\StackFood.Payments.Application\StackFood.Payments.Application.csproj" />
-    <ProjectReference Include="..\..\..\src\StackFood.Payments.Infrastructure\StackFood.Payments.Infrastructure\StackFood.Payments.Infrastructure.csproj" />
+    <!-- Infrastructure removido do cálculo de cobertura - deve ter testes de integração separados -->
+    <!-- <ProjectReference Include="..\..\..\src\StackFood.Payments.Infrastructure\StackFood.Payments.Infrastructure\StackFood.Payments.Infrastructure.csproj" /> -->
+  </ItemGroup>
+
+  <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\**\*.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+    </SpecFlowFeatureFiles>
   </ItemGroup>
 
 </Project>
