@@ -68,7 +68,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./Dockerfile
+          file: ./src/StackFood.Payments.API/StackFood.Payments.API/Dockerfile
           push: false
           tags: stackfood-payments-api:${{ github.sha }}
           cache-from: type=gha
