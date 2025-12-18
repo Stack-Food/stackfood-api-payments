@@ -7,73 +7,76 @@ using StackFood.Payments.Infrastructure.Repositories;
 using StackFood.Payments.Infrastructure.Services;
 using System.Diagnostics.CodeAnalysis;
 
-public class Program
+namespace StackFood.Payments.API
 {
-    [ExcludeFromCodeCoverage]
-    private static void Main(string[] args)
+    public class Program
     {
-        var builder = WebApplication.CreateBuilder(args);
-
-        // Add services to the container
-        builder.Services.AddControllers();
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
-
-        // AWS Configuration
-        var awsOptions = builder.Configuration.GetAWSOptions();
-        builder.Services.AddDefaultAWSOptions(awsOptions);
-        builder.Services.AddAWSService<IAmazonDynamoDB>();
-        builder.Services.AddAWSService<IAmazonSimpleNotificationService>();
-
-        // Environment Variables
-        var dynamoDbTableName = builder.Configuration["DynamoDB:TableName"] ?? "Payments";
-        var snsTopicArn = builder.Configuration["AWS:SnsTopicArn"] ?? string.Empty;
-
-        // Repositories
-        builder.Services.AddScoped<IPaymentRepository>(sp =>
+        [ExcludeFromCodeCoverage]
+        private static void Main(string[] args)
         {
-            var dynamoDb = sp.GetRequiredService<IAmazonDynamoDB>();
-            return new PaymentRepository(dynamoDb, dynamoDbTableName);
-        });
+            var builder = WebApplication.CreateBuilder(args);
 
-        // Services
-        builder.Services.AddScoped<IEventPublisher, SnsEventPublisher>();
-        builder.Services.AddSingleton<IFakeCheckoutService, FakeCheckoutService>();
+            // Add services to the container
+            builder.Services.AddControllers();
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
 
-        // Use Cases
-        builder.Services.AddScoped(sp =>
-        {
-            var paymentRepository = sp.GetRequiredService<IPaymentRepository>();
-            var eventPublisher = sp.GetRequiredService<IEventPublisher>();
-            var fakeCheckoutService = sp.GetRequiredService<IFakeCheckoutService>();
-            return new CreatePaymentUseCase(paymentRepository, eventPublisher, fakeCheckoutService, snsTopicArn);
-        });
+            // AWS Configuration
+            var awsOptions = builder.Configuration.GetAWSOptions();
+            builder.Services.AddDefaultAWSOptions(awsOptions);
+            builder.Services.AddAWSService<IAmazonDynamoDB>();
+            builder.Services.AddAWSService<IAmazonSimpleNotificationService>();
 
-        // CORS
-        builder.Services.AddCors(options =>
-        {
-            options.AddDefaultPolicy(policy =>
+            // Environment Variables
+            var dynamoDbTableName = builder.Configuration["DynamoDB:TableName"] ?? "Payments";
+            var snsTopicArn = builder.Configuration["AWS:SnsTopicArn"] ?? string.Empty;
+
+            // Repositories
+            builder.Services.AddScoped<IPaymentRepository>(sp =>
             {
-                policy.AllowAnyOrigin()
-                      .AllowAnyMethod()
-                      .AllowAnyHeader();
+                var dynamoDb = sp.GetRequiredService<IAmazonDynamoDB>();
+                return new PaymentRepository(dynamoDb, dynamoDbTableName);
             });
-        });
 
-        var app = builder.Build();
+            // Services
+            builder.Services.AddScoped<IEventPublisher, SnsEventPublisher>();
+            builder.Services.AddSingleton<IFakeCheckoutService, FakeCheckoutService>();
 
-        // Configure the HTTP request pipeline
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI();
+            // Use Cases
+            builder.Services.AddScoped(sp =>
+            {
+                var paymentRepository = sp.GetRequiredService<IPaymentRepository>();
+                var eventPublisher = sp.GetRequiredService<IEventPublisher>();
+                var fakeCheckoutService = sp.GetRequiredService<IFakeCheckoutService>();
+                return new CreatePaymentUseCase(paymentRepository, eventPublisher, fakeCheckoutService, snsTopicArn);
+            });
+
+            // CORS
+            builder.Services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(policy =>
+                {
+                    policy.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader();
+                });
+            });
+
+            var app = builder.Build();
+
+            // Configure the HTTP request pipeline
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI();
+            }
+
+            app.UseHttpsRedirection();
+            app.UseCors();
+            app.UseAuthorization();
+            app.MapControllers();
+
+            app.Run();
         }
-
-        app.UseHttpsRedirection();
-        app.UseCors();
-        app.UseAuthorization();
-        app.MapControllers();
-
-        app.Run();
     }
 }
