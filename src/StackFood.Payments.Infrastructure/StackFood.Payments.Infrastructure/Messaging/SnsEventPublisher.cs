@@ -1,10 +1,12 @@
 using Amazon.SimpleNotificationService;
 using Amazon.SimpleNotificationService.Model;
 using StackFood.Payments.Application.Interfaces;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
 namespace StackFood.Payments.Infrastructure.Messaging;
 
+[ExcludeFromCodeCoverage]
 public class SnsEventPublisher : IEventPublisher
 {
     private readonly IAmazonSimpleNotificationService _sns;
