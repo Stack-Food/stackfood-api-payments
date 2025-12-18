@@ -1,4 +1,4 @@
-name: CI/CD - Products Microservice
+name: CI/CD - Payments Microservice
 
 on:
   push:
