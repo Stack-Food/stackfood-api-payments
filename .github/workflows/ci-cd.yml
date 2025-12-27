@@ -1,10 +1,14 @@
-name: CI/CD - Payments Microservice
+name: CI/CD - Orders Microservice
 
 on:
   push:
-    branches: [main, develop, feat/**]
+    branches: [main, develop]
   pull_request:
     branches: [main, develop]
+  workflow_dispatch:
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   code-tests:
@@ -17,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # Shallow clones should be disabled for better SonarQube analysis
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -31,27 +35,7 @@ jobs:
         run: dotnet build --configuration Release --no-restore
 
       - name: Test
-        run: dotnet test --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./TestResults/
-
-      - name: Code Coverage Report
-        uses: irongut/CodeCoverageSummary@v1.3.0
-        with:
-          filename: TestResults/**/coverage.cobertura.xml
-          badge: true
-          fail_below_min: false
-          format: markdown
-          hide_branch_rate: false
-          hide_complexity: false
-          indicators: true
-          output: both
-          thresholds: "60 80"
-
-      - name: Add Coverage PR Comment
-        uses: marocchino/sticky-pull-request-comment@v2
-        if: github.event_name == 'pull_request'
-        with:
-          recreate: true
-          path: code-coverage-results.md
+        run: dotnet test --configuration Release --no-build --verbosity normal
 
   docker-build:
     name: Docker Build
@@ -64,12 +48,83 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Set Docker tag
+        id: docker_tag
+        run: |
+          if [[ "${GITHUB_REF##*/}" == "main" ]]; then
+            echo "tag=main" >> $GITHUB_OUTPUT
+          elif [[ "${GITHUB_REF##*/}" == "develop" ]]; then
+            echo "tag=develop" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${GITHUB_SHA}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Build Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./src/StackFood.Payments.API/StackFood.Payments.API/Dockerfile
+          file: ./Dockerfile
           push: false
-          tags: stackfood-payments-api:${{ github.sha }}
+          tags: stackfood-orders-api:${{ steps.docker_tag.outputs.tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  docker-push:
+    name: Docker Push to GHCR
+    runs-on: ubuntu-latest
+    needs: docker-build
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install cosign
+        if: github.event_name != 'pull_request'
+        uses: sigstore/cosign-installer@v4.0.0 #v3.5.0
+        with:
+          cosign-release: "v3.0.2"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Extract metadata (tags, labels) for Docker
+      # https://github.com/docker/metadata-action
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5.10.0
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+      - name: Build and Push Docker image
+        id: build-and-push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/stackfood-orders-api:${{ github.ref_name }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Sign the resulting Docker image digest except on PRs.
+      # This will only write to the public Rekor transparency log when the Docker
+      # repository is public to avoid leaking data.  If you would like to publish
+      # transparency data even for private images, pass --force to cosign below.
+      # https://github.com/sigstore/cosign
+      - name: Sign the published Docker image
+        if: ${{ github.event_name != 'pull_request' }}
+        env:
+          # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-an-intermediate-environment-variable
+          TAGS: ${{ steps.meta.outputs.tags }}
+          DIGEST: ${{ steps.build-and-push.outputs.digest }}
+        # This step uses the identity token to provision an ephemeral certificate
+        # against the sigstore community Fulcio instance.
+        run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}

@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: payments
+
+bases:
+  - ../base
+
+resources:
+  - configmap.yaml
+  - secret.yaml
+
+images:
+  - name: ghcr.io/stack-food/stackfood-api-payments
+    newTag: latest
+
+replicas:
+  - name: stackfood-payments
+    count: 2

@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: stackfood-payments-config
+  labels:
+    app.kubernetes.io/name: stackfood-payments
+    app.kubernetes.io/part-of: stackfood
+data:
+  # AWS DynamoDB Configuration
+  AWS__Region: "us-east-1"
+  AWS__ServiceURL: ""
+  DYNAMODB_TABLE_NAME: "Payments"
+
+  # AWS SNS Configuration
+  AWS__SNS__PaymentEventsTopicArn: "REPLACE_WITH_SNS_PAYMENT_EVENTS_TOPIC_ARN"
+
+  # AWS SQS Configuration
+  AWS__SQS__OrderEventsQueueUrl: "REPLACE_WITH_SQS_ORDER_EVENTS_QUEUE_URL"
+
+  # Application Settings
+  ASPNETCORE_ENVIRONMENT: "Production"
+  ASPNETCORE_URLS: "http://+:8082"

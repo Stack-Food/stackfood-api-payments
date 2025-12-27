@@ -31,7 +31,7 @@ public class PaymentRepository : IPaymentRepository
         };
 
         var response = await _dynamoDb.GetItemAsync(request);
-        return response.Item.Any() ? MapToPayment(response.Item) : null;
+        return response.Item != null && response.Item.Any() ? MapToPayment(response.Item) : null;
     }
 
     public async Task<Payment?> GetByOrderIdAsync(Guid orderId)
