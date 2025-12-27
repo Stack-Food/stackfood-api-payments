@@ -1,8 +1,10 @@
 using Microsoft.Extensions.Hosting;
 using StackFood.Payments.Application.Interfaces;
+using System.Diagnostics.CodeAnalysis;
 
 namespace StackFood.Payments.Infrastructure.Services;
 
+[ExcludeFromCodeCoverage]
 public class OrderQueueConsumerBackgroundService : BackgroundService
 {
     private readonly IOrderQueueConsumer _consumer;

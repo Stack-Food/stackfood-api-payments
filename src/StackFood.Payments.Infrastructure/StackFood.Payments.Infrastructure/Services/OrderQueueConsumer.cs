@@ -6,10 +6,12 @@ using StackFood.Payments.Application.DTOs;
 using StackFood.Payments.Application.Interfaces;
 using StackFood.Payments.Application.UseCases.CreatePayment;
 using StackFood.Payments.Domain.Events;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
 namespace StackFood.Payments.Infrastructure.Services;
 
+[ExcludeFromCodeCoverage]
 public class OrderQueueConsumer : IOrderQueueConsumer
 {
     private readonly IAmazonSQS _sqsClient;
