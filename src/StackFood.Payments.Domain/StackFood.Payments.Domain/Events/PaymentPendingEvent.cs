@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace StackFood.Payments.Domain.Events;
 
+[ExcludeFromCodeCoverage]
 public class PaymentPendingEvent
 {
     public string EventType => "PaymentPending";

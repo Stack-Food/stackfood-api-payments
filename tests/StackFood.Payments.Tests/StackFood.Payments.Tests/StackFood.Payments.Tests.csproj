@@ -15,6 +15,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="FluentAssertions" Version="8.8.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.3.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="SpecFlow" Version="3.9.74" />
@@ -28,8 +29,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\src\StackFood.Payments.API\StackFood.Payments.API\StackFood.Payments.API.csproj" />
     <ProjectReference Include="..\..\..\src\StackFood.Payments.Domain\StackFood.Payments.Domain\StackFood.Payments.Domain.csproj" />
     <ProjectReference Include="..\..\..\src\StackFood.Payments.Application\StackFood.Payments.Application\StackFood.Payments.Application.csproj" />
+    <ProjectReference Include="..\..\..\src\StackFood.Payments.Infrastructure\StackFood.Payments.Infrastructure\StackFood.Payments.Infrastructure.csproj" />
     <!-- Infrastructure removido do cálculo de cobertura - deve ter testes de integração separados -->
     <!-- <ProjectReference Include="..\..\..\src\StackFood.Payments.Infrastructure\StackFood.Payments.Infrastructure\StackFood.Payments.Infrastructure.csproj" /> -->
   </ItemGroup>

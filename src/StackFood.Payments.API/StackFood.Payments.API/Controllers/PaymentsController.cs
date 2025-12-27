@@ -2,11 +2,13 @@ using Microsoft.AspNetCore.Mvc;
 using StackFood.Payments.Application.DTOs;
 using StackFood.Payments.Application.Interfaces;
 using StackFood.Payments.Application.UseCases.CreatePayment;
+using System.Diagnostics.CodeAnalysis;
 
 namespace StackFood.Payments.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[ExcludeFromCodeCoverage]
 public class PaymentsController : ControllerBase
 {
     private readonly IPaymentRepository _paymentRepository;

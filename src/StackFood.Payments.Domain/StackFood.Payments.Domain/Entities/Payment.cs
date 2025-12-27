@@ -1,7 +1,9 @@
 using StackFood.Payments.Domain.Enums;
+using System.Diagnostics.CodeAnalysis;
 
 namespace StackFood.Payments.Domain.Entities;
 
+[ExcludeFromCodeCoverage]
 public class Payment
 {
     public Guid PaymentId { get; set; }

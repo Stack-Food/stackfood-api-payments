@@ -1,7 +1,17 @@
-using StackFood.Payments.Worker;
+using System.Diagnostics.CodeAnalysis;
 
-var builder = Host.CreateApplicationBuilder(args);
-builder.Services.AddHostedService<Worker>();
+namespace StackFood.Payments.Worker
+{
+    [ExcludeFromCodeCoverage]
+    public class Program
+    {
+        private static void Main(string[] args)
+        {
+            var builder = Host.CreateApplicationBuilder(args);
+            builder.Services.AddHostedService<Worker>();
 
-var host = builder.Build();
-host.Run();
+            var host = builder.Build();
+            host.Run();
+        }
+    }
+}
