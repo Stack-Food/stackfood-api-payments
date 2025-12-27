@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stackfood-payments
+  labels:
+    app.kubernetes.io/name: stackfood-payments
+    app.kubernetes.io/instance: stackfood-payments
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: stackfood
+    app: stackfood-payments
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: stackfood-payments
+      app: stackfood-payments
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: stackfood-payments
+        app.kubernetes.io/instance: stackfood-payments
+        app.kubernetes.io/component: backend
+        app.kubernetes.io/part-of: stackfood
+        app: stackfood-payments
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "8082"
+    spec:
+      imagePullSecrets:
+        - name: ghcr-secret
+      containers:
+        - name: payments
+          image: ghcr.io/stack-food/stackfood-api-payments:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8082
+              name: http
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          envFrom:
+            - configMapRef:
+                name: stackfood-payments-config
+            - secretRef:
+                name: stackfood-payments-secrets
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: "Production"
+            - name: ASPNETCORE_URLS
+              value: "http://+:8082"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8082
+              scheme: HTTP
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            timeoutSeconds: 10
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8082
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3

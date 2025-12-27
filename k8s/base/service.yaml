@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: stackfood-payments
+  labels:
+    app.kubernetes.io/name: stackfood-payments
+    app.kubernetes.io/instance: stackfood-payments
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: stackfood
+    app: stackfood-payments
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8082
+      targetPort: 8082
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: stackfood-payments
+    app: stackfood-payments

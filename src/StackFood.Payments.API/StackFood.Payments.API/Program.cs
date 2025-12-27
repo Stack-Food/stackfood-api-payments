@@ -14,6 +14,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Health Checks
+builder.Services.AddHealthChecks();
+
 // AWS Configuration
 var awsOptions = builder.Configuration.GetAWSOptions();
 builder.Services.AddDefaultAWSOptions(awsOptions);
@@ -81,5 +84,8 @@ app.UseHttpsRedirection();
 app.UseCors();
 app.UseAuthorization();
 app.MapControllers();
+
+// Health Check Endpoint
+app.MapHealthChecks("/health");
 
 app.Run();
