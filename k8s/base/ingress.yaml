@@ -1,19 +1,20 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: stackfood-payments-ingress
+  name: stackfood-payments
+  namespace: payments
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
     nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   ingressClassName: nginx
   rules:
-  - http:
-      paths:
-      - path: /payments(/|$)(.*)
-        pathType: ImplementationSpecific
-        backend:
-          service:
-            name: stackfood-payments
-            port:
-              number: 8082
+    - http:
+        paths:
+          - path: /payments(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: stackfood-payments
+                port:
+                  number: 8082
