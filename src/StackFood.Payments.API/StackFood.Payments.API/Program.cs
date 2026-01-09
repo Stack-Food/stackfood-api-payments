@@ -1,6 +1,7 @@
 using Amazon.DynamoDBv2;
 using Amazon.SimpleNotificationService;
 using Amazon.SQS;
+using Microsoft.OpenApi.Models;
 using StackFood.Payments.Application.Interfaces;
 using StackFood.Payments.Application.UseCases.CreatePayment;
 using StackFood.Payments.Infrastructure.Messaging;
@@ -20,7 +21,13 @@ namespace StackFood.Payments.API
             // Add services to the container
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.AddServer(new OpenApiServer
+                {
+                    Url = "https://api.stackfood.com.br/payments",
+                });
+            });
 
             // Health Checks
             builder.Services.AddHealthChecks();
