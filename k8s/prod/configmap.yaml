@@ -9,13 +9,13 @@ data:
   # AWS DynamoDB Configuration
   AWS__Region: "us-east-1"
   AWS__ServiceURL: ""
-  DYNAMODB_TABLE_NAME: "Payments"
+  DYNAMODB_TABLE_NAME: "stackfood-payments"
 
   # AWS SNS Configuration
-  AWS__SNS__PaymentEventsTopicArn: "REPLACE_WITH_SNS_PAYMENT_EVENTS_TOPIC_ARN"
+  AWS__SNS__PaymentEventsTopicArn: "arn:aws:sns:us-east-1:975050205506:stackfood-sns-payments-topic"
 
   # AWS SQS Configuration
-  AWS__SQS__OrderEventsQueueUrl: "REPLACE_WITH_SQS_ORDER_EVENTS_QUEUE_URL"
+  AWS__SQS__QueueUrl: "https://sqs.us-east-1.amazonaws.com/975050205506/stackfood-sqs-payments-queue"
 
   # Application Settings
   ASPNETCORE_ENVIRONMENT: "Production"

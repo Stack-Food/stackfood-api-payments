@@ -11,8 +11,8 @@ resources:
   - secret.yaml
 
 images:
-  - name: ghcr.io/stack-food/stackfood-api-payments
-    newTag: latest
+  - name: ghcr.io/stack-food/stackfood-payments-api
+    newTag: main
 
 replicas:
   - name: stackfood-payments
