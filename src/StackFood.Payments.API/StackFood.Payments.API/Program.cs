@@ -82,11 +82,13 @@ namespace StackFood.Payments.API
             var app = builder.Build();
 
             // Configure the HTTP request pipeline
-            if (app.Environment.IsDevelopment())
+            app.UsePathBase("/payments");
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+                c.SwaggerEndpoint("/payments/swagger/v1/swagger.json", "StackFood payments API v1");
+            });
 
             app.UseHttpsRedirection();
             app.UseCors();
